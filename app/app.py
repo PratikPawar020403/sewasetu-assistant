@@ -674,32 +674,30 @@ def admin_reject(app_id):
 def eval_dashboard():
     """Live Evaluation Dashboard showcasing synthetic personas, multi-turn transcripts,
     and database verification assertions."""
-    eval_file = os.path.join(os.path.dirname(BASE_DIR), "evals", "eval_results.json")
     eval_data = None
-    if os.path.exists(eval_file):
-        try:
-            with open(eval_file, "r", encoding="utf-8") as f:
-                eval_data = json.load(f)
-        except Exception as e:
-            app.logger.warning("Could not read eval_results.json: %s", e)
+    candidate_paths = [
+        os.path.join(BASE_DIR, "eval_results.json"),
+        os.path.join(os.path.dirname(BASE_DIR), "evals", "eval_results.json"),
+        os.path.join(BASE_DIR, "evals", "eval_results.json"),
+        "/app/eval_results.json",
+    ]
+    for path in candidate_paths:
+        if os.path.exists(path):
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    loaded = json.load(f)
+                    if loaded and loaded.get("results"):
+                        eval_data = loaded
+                        break
+            except Exception as e:
+                app.logger.warning("Could not read %s: %s", path, e)
 
     if not eval_data:
-        # Fallback to generating evaluation data or reading pre-rendered results
         try:
-            sys.path.insert(0, os.path.join(os.path.dirname(BASE_DIR), "evals"))
-            import runner
-            eval_data = runner.run_all_evals()
-        except Exception:
-            # Minimal static fallback if runner is unable to connect to db
-            eval_data = {
-                "timestamp": datetime.now().isoformat(),
-                "total_personas": 9,
-                "passed_personas": 9,
-                "total_assertions": 9,
-                "passed_assertions": 9,
-                "pass_rate_percent": 100.0,
-                "results": []
-            }
+            from eval_data import get_eval_data
+            eval_data = get_eval_data()
+        except Exception as e:
+            app.logger.warning("Could not load from eval_data: %s", e)
 
     return render_template("eval_dashboard.html", eval_data=eval_data)
 
