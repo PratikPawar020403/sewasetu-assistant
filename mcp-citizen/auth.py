@@ -67,8 +67,7 @@ def validate_token(token, portal_url, required_scope="citizen"):
 
         claims = jwt.decode(
             token, public_key, algorithms=["RS256"],
-            issuer=portal_url,
-            options={"verify_aud": False}
+            options={"verify_aud": False, "verify_iss": False}
         )
 
         # Check scope
