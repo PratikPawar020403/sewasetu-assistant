@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluation Dashboard &mdash; Sewa Setu AI Assistant</title>
+<style>
+  :root {
+    --primary: #0b3d6e;
+    --primary-light: #e8f0fe;
+    --accent: #f7931e;
+    --success: #2e7d32;
+    --success-bg: #e8f5e9;
+    --danger: #c62828;
+    --danger-bg: #ffebee;
+    --neutral-bg: #f8fafc;
+    --card-border: #e2e8f0;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    background: #f1f5f9;
+    color: var(--text-main);
+  }
+  .header {
+    background: var(--primary);
+    color: #fff;
+    padding: 18px 32px;
+  }
+  .header-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .header .sub {
+    font-size: 13px;
+    color: #cfe0f3;
+    margin-top: 4px;
+  }
+  .band {
+    background: var(--accent);
+    height: 5px;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 28px auto;
+    padding: 0 16px;
+  }
+  .metric-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .metric-card {
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .metric-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .metric-val {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--primary);
+    margin-top: 6px;
+  }
+  .metric-val.green { color: var(--success); }
+  .metric-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 32px 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .persona-card {
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  .persona-header {
+    padding: 16px 20px;
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--card-border);
+    cursor: pointer;
+  }
+  .persona-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .persona-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+  .badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .badge-citizen { background: #e0f2fe; color: #0369a1; }
+  .badge-officer { background: #fef3c7; color: #b45309; }
+  .badge-pass { background: var(--success-bg); color: var(--success); }
+  .badge-fail { background: var(--danger-bg); color: var(--danger); }
+
+  .persona-body {
+    padding: 20px;
+    background: #fafafa;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .info-box {
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    padding: 14px;
+  }
+  .info-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .info-desc {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #334155;
+  }
+
+  /* Conversation styling */
+  .chat-box {
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    padding: 16px;
+    margin-top: 14px;
+  }
+  .chat-msg {
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+  }
+  .speaker-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .speaker-citizen .speaker-label { color: #0284c7; }
+  .speaker-officer .speaker-label { color: #d97706; }
+  .speaker-assistant .speaker-label { color: var(--primary); }
+
+  .msg-bubble {
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.45;
+    max-width: 90%;
+  }
+  .speaker-citizen .msg-bubble, .speaker-officer .msg-bubble {
+    background: #f1f5f9;
+    color: #1e293b;
+    align-self: flex-start;
+  }
+  .speaker-assistant .msg-bubble {
+    background: var(--primary-light);
+    color: #0c4a6e;
+    align-self: flex-start;
+    border-left: 3px solid var(--primary);
+  }
+
+  .tool-pill {
+    background: #24292f;
+    color: #fff;
+    font-family: monospace;
+    font-size: 11px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin: 8px 0;
+    overflow-x: auto;
+  }
+  .thought-bubble {
+    font-style: italic;
+    font-size: 12px;
+    color: #475569;
+    background: #f8fafc;
+    border-left: 2px solid #94a3b8;
+    padding: 4px 8px;
+    margin-bottom: 6px;
+  }
+
+  /* Assertions styling */
+  .assertions-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 14px;
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .assertions-table th {
+    background: #f8fafc;
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--card-border);
+  }
+  .assertions-table td {
+    padding: 10px 14px;
+    font-size: 13px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .footer {
+    max-width: 1100px;
+    margin: 40px auto 30px;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+  .footer a {
+    color: var(--primary);
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-content">
+    <div>
+      <h1>Sewa Setu &mdash; AI Assistant Evaluation Dashboard</h1>
+      <div class="sub">Department of Social Welfare &middot; Government of Purvanchal</div>
+    </div>
+    <div>
+      <span class="badge" style="background: rgba(255,255,255,0.2); color: #fff;">Dual MCP Architecture</span>
+    </div>
+  </div>
+</div>
+<div class="band"></div>
+
+<div class="container">
+  <!-- Top Metrics -->
+  <div class="metric-row">
+    <div class="metric-card">
+      <div class="metric-title">Overall Pass Rate</div>
+      <div class="metric-val green">{{ eval_data.pass_rate_percent }}%</div>
+      <div class="metric-sub">{{ eval_data.passed_assertions }}/{{ eval_data.total_assertions }} Assertions Validated</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-title">Personas Evaluated</div>
+      <div class="metric-val">{{ eval_data.total_personas }}</div>
+      <div class="metric-sub">{{ eval_data.passed_personas }} Completed Successfully</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-title">Citizen Assistant Server</div>
+      <div class="metric-val" style="font-size: 22px; margin-top: 14px;">Active</div>
+      <div class="metric-sub">Port 8001 &middot; Scope: <code>citizen</code></div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-title">Officer Assistant Server</div>
+      <div class="metric-val" style="font-size: 22px; margin-top: 14px;">Active</div>
+      <div class="metric-sub">Port 8002 &middot; Scope: <code>officer</code></div>
+    </div>
+  </div>
+
+  <div class="section-title">
+    <span>Evaluation Scenarios &amp; Persona Database Verification</span>
+  </div>
+
+  <!-- Persona Cards -->
+  {% for r in eval_data.results %}
+  <div class="persona-card">
+    <div class="persona-header" onclick="toggleDetails('{{ r.persona_id }}')">
+      <div class="persona-title-group">
+        <span class="persona-name">{{ r.persona_name }}</span>
+        {% if r.role == 'citizen' %}
+          <span class="badge badge-citizen">Citizen</span>
+        {% else %}
+          <span class="badge badge-officer">Officer</span>
+        {% endif %}
+        <span style="font-size: 13px; color: var(--text-muted);">&bull; {{ r.scenario }}</span>
+      </div>
+      <div>
+        {% if r.passed %}
+          <span class="badge badge-pass">&check; PASSED</span>
+        {% else %}
+          <span class="badge badge-fail">&#10008; FAILED</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="persona-body" id="body-{{ r.persona_id }}">
+      <div class="info-grid">
+        <div class="info-box">
+          <div class="info-label">Character Persona</div>
+          <div class="info-desc">{{ r.personality }}</div>
+        </div>
+        <div class="info-box">
+          <div class="info-label">Intended Goal</div>
+          <div class="info-desc">{{ r.goal }}</div>
+        </div>
+      </div>
+
+      <!-- Database Assertions Table -->
+      <div style="font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">
+        Post-Conversation Database Assertions:
+      </div>
+      <table class="assertions-table">
+        <thead>
+          <tr>
+            <th style="width: 35%;">Assertion Checked</th>
+            <th style="width: 50%;">Database State Output</th>
+            <th style="width: 15%; text-align: center;">Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in r.assertions %}
+          <tr>
+            <td><strong>{{ a.description }}</strong></td>
+            <td style="color: #334155; font-family: monospace; font-size: 12px;">{{ a.actual }}</td>
+            <td style="text-align: center;">
+              {% if a.passed %}
+                <span class="badge badge-pass">&check; Pass</span>
+              {% else %}
+                <span class="badge badge-fail">&#10008; Fail</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <!-- Multi-Turn Conversation Transcript -->
+      <div style="font-size: 13px; font-weight: 700; color: var(--text-main); margin: 20px 0 6px;">
+        Multi-Turn Conversation &amp; Tool Invocations:
+      </div>
+      <div class="chat-box">
+        {% for m in r.transcript %}
+        <div class="chat-msg speaker-{{ m.speaker }}">
+          <div class="speaker-label">
+            {% if m.speaker == 'citizen' %}
+              Citizen &mdash; {{ r.persona_name }}
+            {% elif m.speaker == 'officer' %}
+              Officer &mdash; {{ r.persona_name }}
+            {% else %}
+              Sewa Setu AI Assistant
+            {% endif %}
+          </div>
+          {% if m.thought %}
+            <div class="thought-bubble">
+              &boxbox; <strong>Internal Reasoning:</strong> {{ m.thought }}
+            </div>
+          {% endif %}
+          {% if m.tool_call %}
+            <div class="tool-pill">
+              <strong>Tool Executed:</strong> {{ m.tool_call.name }}<br>
+              <strong>Arguments:</strong> {{ m.tool_call.args }}<br>
+              <strong>Result:</strong> {{ m.tool_result }}
+            </div>
+          {% endif %}
+          <div class="msg-bubble">
+            {{ m.text }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+</div>
+
+<div class="footer">
+  Sewa Setu Evaluation Harness &middot; Department of Social Welfare &middot; Government of Purvanchal<br>
+  <a href="/">Back to Portal</a> &bull; <a href="/status">Citizen Status Portal</a> &bull; <a href="/admin">Departmental Admin</a>
+</div>
+
+<script>
+function toggleDetails(id) {
+  var el = document.getElementById("body-" + id);
+  if (el.style.display === "none") {
+    el.style.display = "block";
+  } else {
+    el.style.display = "none";
+  }
+}
+</script>
+
+</body>
+</html>
