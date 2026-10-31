@@ -71,7 +71,13 @@
         }
       ],
       "passed": true,
-      "evaluated_at": "2026-10-30T23:30:15+05:30"
+      "evaluated_at": "2026-10-30T23:30:15+05:30",
+      "why_persona": "Represents the primary target user: a 68-year-old rural widow speaking colloquial Hindustani/Assamese, needing empathetic and patient assistance.",
+      "what_learned": "Initially, the assistant did not verify whether an active application already existed on her mobile before drafting. We updated the prompt and tool workflow to always run check_eligibility upfront and validate IFSC length.",
+      "tags": [
+        "citizen",
+        "primary_flow"
+      ]
     },
     {
       "persona_id": "raju_borah",
@@ -109,7 +115,13 @@
         }
       ],
       "passed": true,
-      "evaluated_at": "2026-10-30T23:30:22+05:30"
+      "evaluated_at": "2026-10-30T23:30:22+05:30",
+      "why_persona": "Tests the statutory age boundary (age 55 vs 60 minimum required under Purvanchal Social Welfare rules) and handling an impatient citizen requesting an exception.",
+      "what_learned": "The model originally tried to apologize and prompt for another date of birth. We tuned the prompt to firmly cite Department statutory rules and ensure zero draft or pending records are created in PostgreSQL.",
+      "tags": [
+        "citizen",
+        "edge_case"
+      ]
     },
     {
       "persona_id": "harish_chandra",
@@ -155,7 +167,13 @@
         }
       ],
       "passed": true,
-      "evaluated_at": "2026-10-30T23:30:28+05:30"
+      "evaluated_at": "2026-10-30T23:30:28+05:30",
+      "why_persona": "A 72-year-old retired, literate citizen checking an existing application; tests status lookup and statutory 15-day Right to Public Services Act (RTPS) SLA explanation.",
+      "what_learned": "Ensured the assistant proactively calculates the elapsed days and reassures applicants about automatic statutory deemed approval under the RTPS Act when pending beyond 15 days.",
+      "tags": [
+        "citizen",
+        "status_check"
+      ]
     },
     {
       "persona_id": "meera_bai",
@@ -199,7 +217,13 @@
         }
       ],
       "passed": true,
-      "evaluated_at": "2026-10-30T23:30:35+05:30"
+      "evaluated_at": "2026-10-30T23:30:35+05:30",
+      "why_persona": "Tests duplicate application prevention when a citizen already holds an APPROVED pension and tries to re-apply.",
+      "what_learned": "The portal throws a 409 Conflict for duplicate active numbers. We trained the assistant to explain clearly that benefits are already active, preventing applicant confusion.",
+      "tags": [
+        "citizen",
+        "edge_case"
+      ]
     },
     {
       "persona_id": "gopal_krishna",
@@ -268,7 +292,13 @@
         }
       ],
       "passed": true,
-      "evaluated_at": "2026-10-30T23:30:42+05:30"
+      "evaluated_at": "2026-10-30T23:30:42+05:30",
+      "why_persona": "Tests multi-step transactional error correction: withdrawing an erroneous pending application and re-applying with corrected bank details.",
+      "what_learned": "A two-step lifecycle: withdraw_application must be executed and committed to the database first before submit_application can succeed on the same mobile number.",
+      "tags": [
+        "citizen",
+        "edge_case"
+      ]
     },
     {
       "persona_id": "lakshmi_devi",
@@ -306,7 +336,13 @@
         }
       ],
       "passed": true,
-      "evaluated_at": "2026-10-30T23:30:48+05:30"
+      "evaluated_at": "2026-10-30T23:30:48+05:30",
+      "why_persona": "Tests cautious inquiry from an eligible widow who wants policy clarification before committing personal data.",
+      "what_learned": "The assistant must answer policy and widow eligibility questions transparently without prematurely pressuring the user for documents.",
+      "tags": [
+        "citizen",
+        "inquiry"
+      ]
     },
     {
       "persona_id": "officer_singh",
@@ -371,7 +407,13 @@
         }
       ],
       "passed": true,
-      "evaluated_at": "2026-10-30T23:30:54+05:30"
+      "evaluated_at": "2026-10-30T23:30:54+05:30",
+      "why_persona": "Tests Block Development Officer (BDO) queue filtering for Sonari block and recording approvals with mandatory audit notes.",
+      "what_learned": "Enforced mandatory audit notes in the approve_application tool so the permanent audit trail always tracks officer identity and verification notes.",
+      "tags": [
+        "officer",
+        "workflow"
+      ]
     },
     {
       "persona_id": "officer_dutta",
@@ -413,7 +455,13 @@
         }
       ],
       "passed": true,
-      "evaluated_at": "2026-10-30T23:31:00+05:30"
+      "evaluated_at": "2026-10-30T23:31:00+05:30",
+      "why_persona": "Tests application rejection handling where an applicant submitted invalid or illegible age-proof documents.",
+      "what_learned": "Arbitrary rejections are legally contestable under RTPS. We made reason a mandatory parameter in reject_application so officers must explicitly document defects.",
+      "tags": [
+        "officer",
+        "edge_case"
+      ]
     },
     {
       "persona_id": "officer_manager",
@@ -451,7 +499,13 @@
         }
       ],
       "passed": true,
-      "evaluated_at": "2026-10-30T23:31:05+05:30"
+      "evaluated_at": "2026-10-30T23:31:05+05:30",
+      "why_persona": "Tests district-level monitoring across all 6 blocks and tracking overdue pending cases approaching the 15-day SLA.",
+      "what_learned": "Aggregated block-wise distributions and overdue counters into dashboard_stats so managers can reassign staff before automated deemed approval triggers.",
+      "tags": [
+        "officer",
+        "analytics"
+      ]
     }
   ]
 }

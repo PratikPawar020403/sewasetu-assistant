@@ -6,8 +6,48 @@
 applications used by a person, the person signs in and consents through the portal's OAuth
 flow instead (see README).</p>
 {% if token %}
-<p>New token (shown once):</p>
-<pre style="background:#f4f4f4;padding:12px;border:1px solid #ccd;word-break:break-all;white-space:pre-wrap">{{ token }}</pre>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px;">
+  <strong>New token (shown once):</strong>
+  <button id="copyTokenBtn" type="button" class="btn" style="padding:5px 14px; font-size:13px; background:#0b3d6e; border-radius:4px; font-weight:600; cursor:pointer;" onclick="copyToken()">
+    Copy Token
+  </button>
+</div>
+<pre id="tokenPre" style="background:#f4f4f4;padding:12px;border:1px solid #ccd;word-break:break-all;white-space:pre-wrap;margin-top:6px;user-select:all;">{{ token }}</pre>
+<script>
+function copyToken() {
+  const text = document.getElementById('tokenPre').innerText.trim();
+  const btn = document.getElementById('copyTokenBtn');
+  function showSuccess() {
+    btn.innerText = 'Copied!';
+    btn.style.background = '#2e7d32';
+    setTimeout(function() {
+      btn.innerText = 'Copy Token';
+      btn.style.background = '#0b3d6e';
+    }, 2000);
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(showSuccess, fallback);
+  } else {
+    fallback();
+  }
+  function fallback() {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+      document.execCommand('copy');
+      showSuccess();
+    } catch (err) {
+      btn.innerText = 'Failed to copy';
+    }
+    document.body.removeChild(ta);
+  }
+}
+</script>
 {% endif %}
 <form method="post">
   <label>Label</label>
